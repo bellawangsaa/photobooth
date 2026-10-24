@@ -15,6 +15,8 @@
     filtered: new Map(),
     shooting: false,
     showingResult: false,
+    facing: 'user',
+    mirror: true,
     version: 0,       // bumps whenever the result image changes
     sentVersion: -1,  // version last saved to Drive
     uploading: false,
@@ -25,6 +27,7 @@
   const pctx = preview.getContext('2d', { willReadFrequently: true });
   const result = $('#result');
   let stream = null;
+  let looping = false;
 
   /* ---------- helpers ---------- */
 
@@ -59,13 +62,15 @@
     return s.w / s.h;
   }
 
-  // Draw `src` into a (dw x dh) box, cropping to cover, mirrored like a selfie.
+  // Draw `src` into a (dw x dh) box, cropping to cover; selfie cameras are mirrored.
   function drawCover(ctx, src, sw, sh, dw, dh) {
     const k = Math.max(dw / sw, dh / sh);
     const cw = dw / k, ch = dh / k;
     ctx.save();
-    ctx.translate(dw, 0);
-    ctx.scale(-1, 1);
+    if (state.mirror) {
+      ctx.translate(dw, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, dw, dh);
     ctx.restore();
   }
@@ -106,20 +111,27 @@
 
   /* ---------- camera ---------- */
 
-  async function startCamera() {
+  async function startCamera(deviceId) {
     if (!navigator.mediaDevices?.getUserMedia) {
       showCamError('Browser ini belum bisa akses kamera. Pastikan web dibuka lewat HTTPS (atau localhost) di Chrome/Safari terbaru.');
       return;
     }
+    // Release the current camera first — phones can't open two at once.
+    if (stream) stream.getTracks().forEach((t) => t.stop());
+    stream = null;
     try {
+      const size = { width: { ideal: 1920 }, height: { ideal: 1080 } };
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: deviceId ? { deviceId: { exact: deviceId }, ...size } : { facingMode: state.facing, ...size },
         audio: false,
       });
       video.srcObject = stream;
       await video.play();
+      state.mirror = (stream.getVideoTracks()[0].getSettings().facingMode || 'user') !== 'environment';
       $('#camError').hidden = true;
-      requestAnimationFrame(loop);
+      if (!looping) { looping = true; requestAnimationFrame(loop); }
+      const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput');
+      $('#switchCam').hidden = cams.length < 2;
     } catch (err) {
       const denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
       showCamError(denied
@@ -128,12 +140,30 @@
     }
   }
 
+  async function switchCamera() {
+    if (state.shooting || !stream) return;
+    const btn = $('#switchCam');
+    btn.disabled = true;
+    const before = stream.getVideoTracks()[0].getSettings().deviceId;
+    state.facing = state.facing === 'user' ? 'environment' : 'user';
+    await startCamera();
+    // Laptops ignore facingMode, so cycle through the attached cameras instead.
+    const now = stream && stream.getVideoTracks()[0].getSettings().deviceId;
+    if (now && now === before) {
+      const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput');
+      const i = cams.findIndex((d) => d.deviceId === now);
+      if (cams.length > 1) await startCamera(cams[(i + 1) % cams.length].deviceId);
+    }
+    btn.disabled = false;
+  }
+
   function showCamError(msg) {
     $('#camErrorMsg').textContent = msg;
     $('#camError').hidden = false;
   }
 
-  $('#camRetry').addEventListener('click', startCamera);
+  $('#camRetry').addEventListener('click', () => startCamera());
+  $('#switchCam').addEventListener('click', switchCamera);
 
   function loop() {
     requestAnimationFrame(loop);

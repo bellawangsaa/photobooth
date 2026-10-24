@@ -284,6 +284,26 @@ body {
 .flash.go { animation: flash .45s ease-out; }
 @keyframes flash { 0% { opacity: .95; } 100% { opacity: 0; } }
 
+.switch-cam {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 3px 0 var(--pink-deep), 0 6px 16px -6px rgba(0,0,0,.4);
+  cursor: pointer;
+}
+.switch-cam svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.switch-cam:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--pink-deep); }
+.switch-cam:disabled { opacity: .6; }
+.is-shooting .switch-cam { display: none; }
+
 .cam-error {
   position: absolute;
   inset: 0;
