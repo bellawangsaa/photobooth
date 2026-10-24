@@ -2,7 +2,7 @@
 
 Photobooth online untuk **Bella's 21st Birthday**, dengan desain sesuai brand guideline (kuning, pink, cream, motif lotus dan bunga, font script retro).
 
-Alurnya: tamu isi nama → pilih layout, filter, dan frame → foto dengan hitung mundur → hasil langsung bisa **disimpan ke Google Drive** (nama file = nama tamu + waktu) atau di-download.
+Alurnya: tamu isi nama → pilih layout, filter, dan frame → foto dengan hitung mundur → hasil **otomatis tersimpan ke Google Drive** (nama file = nama tamu + waktu). Kalau tamu ganti filter/frame setelahnya, versi baru bisa disimpan lagi lewat tombol "Simpan versi ini ke Drive".
 
 ## Fitur
 

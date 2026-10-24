@@ -15,7 +15,9 @@
     filtered: new Map(),
     shooting: false,
     showingResult: false,
-    sent: false,
+    version: 0,       // bumps whenever the result image changes
+    sentVersion: -1,  // version last saved to Drive
+    uploading: false,
   };
 
   const video = $('#video');
@@ -218,7 +220,7 @@
   function resetShots() {
     state.shots = [];
     state.filtered.clear();
-    state.sent = false;
+    state.version++;
     showResult(false);
     renderFilm();
   }
@@ -296,6 +298,7 @@
     renderResult();
     showResult(true);
     bringStageIntoView();
+    sendToDrive(); // auto-save every finished session
   }
 
   // On phones the controls sit below the camera; scroll back so guests see the countdown.
@@ -314,7 +317,7 @@
 
   function renderResult() {
     renderFrame(result, state.layout, state.frame, photosForFilter(), meta(), EXPORT_SCALE);
-    state.sent = false;
+    state.version++;
     updateDriveBtn();
   }
 
@@ -326,8 +329,12 @@
 
   function updateDriveBtn() {
     const b = $('#driveBtn');
-    b.disabled = state.sent;
-    b.querySelector('span').textContent = state.sent ? 'Tersimpan di Drive ✓' : 'Simpan ke Drive';
+    const saved = state.sentVersion === state.version;
+    b.disabled = saved || state.uploading;
+    b.querySelector('span').textContent = state.uploading ? 'Menyimpan ke Drive…'
+      : saved ? 'Tersimpan di Drive ✓'
+      : state.sentVersion >= 0 ? 'Simpan versi ini ke Drive'
+      : 'Simpan ke Drive';
   }
 
   /* ---------- output ---------- */
@@ -350,27 +357,26 @@
       toast('Link Google Drive belum disetup — isi appsScriptUrl di js/config.js (lihat README).', 'error');
       return;
     }
-    const b = $('#driveBtn');
-    b.disabled = true;
-    b.querySelector('span').textContent = 'Mengirim…';
+    if (state.uploading || state.sentVersion === state.version) return;
+    // Snapshot now: the guest may change frame/filter or leave while this uploads.
+    const version = state.version;
+    const name = state.name;
+    const payload = JSON.stringify({ name, filename: fileName(), image: result.toDataURL('image/jpeg', 0.9) });
+    state.uploading = true;
+    updateDriveBtn();
     try {
       // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight.
-      const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: state.name,
-          filename: fileName(),
-          image: result.toDataURL('image/jpeg', 0.9),
-        }),
-      });
+      const res = await fetch(url, { method: 'POST', body: payload });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || 'Upload gagal');
-      state.sent = true;
-      toast(`Yay! Foto ${state.name} sudah masuk Drive 💛`);
+      state.sentVersion = version;
+      toast(`Yay! Foto ${name} sudah tersimpan di Drive 💛`);
     } catch (err) {
-      toast(`Gagal kirim ke Drive: ${err.message}`, 'error');
+      toast(`Gagal simpan ke Drive: ${err.message}. Coba tekan "Simpan ke Drive" lagi.`, 'error');
+    } finally {
+      state.uploading = false;
+      updateDriveBtn();
     }
-    updateDriveBtn();
   }
 
   $('#shootBtn').addEventListener('click', shoot);
