@@ -4,7 +4,7 @@
 const FOLDER_ID = '1AHjp3AM5rrcI4HgSkBTAZ0tYLzuV1ao8';
 
 // true = each guest gets their own subfolder (named after them) inside FOLDER_ID.
-const SUBFOLDER_PER_GUEST = false;
+const SUBFOLDER_PER_GUEST = true;
 
 function doPost(e) {
   try {

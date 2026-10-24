@@ -32,7 +32,7 @@ Web statis tidak bisa langsung menulis ke Drive, jadi kita pakai Google Apps Scr
 1. Login ke akun Google pemilik folder Drive. Buka https://script.google.com, lalu klik **New project**.
 2. Hapus isi editor, lalu paste isi file `apps-script/Code.gs`. Folder ID sudah terisi:
    `1AHjp3AM5rrcI4HgSkBTAZ0tYLzuV1ao8`
-   (Kalau mau tiap tamu punya subfolder sendiri, ubah `SUBFOLDER_PER_GUEST = true`.)
+   (Tiap tamu otomatis dapat subfolder sesuai namanya. Kalau mau semua foto langsung di folder utama, ubah `SUBFOLDER_PER_GUEST = false`.)
 3. Klik **Deploy → New deployment** → ikon gear → pilih **Web app**.
    - Execute as: **Me**
    - Who has access: **Anyone**
