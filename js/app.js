@@ -348,6 +348,9 @@
   function renderResult() {
     renderFrame(result, state.layout, state.frame, photosForFilter(), meta(), EXPORT_SCALE);
     state.version++;
+    // Encode now so the Download tap can hand a ready file to the share sheet
+    // (iOS only allows sharing straight from the tap, not after a slow encode).
+    state.blob = new Promise((r) => result.toBlob(r, 'image/jpeg', 0.92));
     updateDriveBtn();
   }
 
@@ -377,17 +380,50 @@
 
   /* ---------- output ---------- */
 
-  function download() {
-    result.toBlob((blob) => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = fileName();
-      document.body.append(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    }, 'image/jpeg', 0.92);
+  const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+  const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Line\/|WhatsApp|TikTok|musical_ly|Snapchat|Twitter/i.test(navigator.userAgent);
+
+  async function download() {
+    const blob = await state.blob;
+    if (!blob) return;
+    const file = new File([blob], fileName(), { type: 'image/jpeg' });
+
+    // Phones: the share sheet has "Save Image", which goes straight to the gallery.
+    if (IS_TOUCH && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    // In-app browsers (Instagram, WhatsApp, …) ignore downloads; long-press still works.
+    if (IS_TOUCH && (IN_APP || navigator.canShare)) {
+      showSaveSheet(blob);
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    if (IS_TOUCH) toast('Kalau foto tidak tersimpan, tekan lama foto di layar lalu pilih Simpan.');
   }
+
+  function showSaveSheet(blob) {
+    const url = URL.createObjectURL(blob);
+    const sheet = $('#saveSheet');
+    $('#saveImg').src = url;
+    $('#saveLink').href = url;
+    $('#saveLink').download = fileName();
+    $('#saveInApp').hidden = !IN_APP;
+    sheet.showModal();
+    sheet.addEventListener('close', () => setTimeout(() => URL.revokeObjectURL(url), 1000), { once: true });
+  }
+
+  $('#saveClose').addEventListener('click', () => $('#saveSheet').close());
 
   async function sendToDrive() {
     const url = (window.PHOTOBOOTH_CONFIG || {}).appsScriptUrl;

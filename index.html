@@ -152,11 +152,25 @@
       <div>
         <strong id="viewerName" class="script"></strong>
         <span id="viewerDate" class="eyebrow small"></span>
+        <span class="viewer-tip">Tip: tekan lama foto untuk menyimpan</span>
       </div>
       <div class="row">
         <a id="viewerDownload" class="btn btn-pink" href="#" target="_blank" rel="noopener">Download</a>
         <a id="viewerOpen" class="btn btn-ghost" href="#" target="_blank" rel="noopener">Buka di Drive</a>
       </div>
+    </div>
+  </dialog>
+
+  <dialog id="saveSheet" class="viewer save-sheet" aria-label="Simpan foto">
+    <button id="saveClose" type="button" class="viewer-close" aria-label="Tutup">&times;</button>
+    <p class="save-hint">
+      <strong class="script">Simpan fotomu</strong>
+      <span>Tekan lama foto di bawah, lalu pilih <b>Simpan ke Foto</b> / <b>Download gambar</b>.</span>
+      <span id="saveInApp" class="small" hidden>Lagi buka dari Instagram/WhatsApp? Bisa juga buka link ini di Safari atau Chrome.</span>
+    </p>
+    <img id="saveImg" alt="Hasil foto photobooth">
+    <div class="viewer-bar save-bar">
+      <a id="saveLink" class="btn btn-pink" href="#" download>Download file</a>
     </div>
   </dialog>
 
