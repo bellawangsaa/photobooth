@@ -276,6 +276,7 @@
     resetShots();
     state.shooting = true;
     document.body.classList.add('is-shooting');
+    bringStageIntoView();
     const n = LAYOUTS[state.layout].slots.length;
     try {
       for (let i = 0; i < n; i++) {
@@ -294,6 +295,14 @@
     }
     renderResult();
     showResult(true);
+    bringStageIntoView();
+  }
+
+  // On phones the controls sit below the camera; scroll back so guests see the countdown.
+  function bringStageIntoView() {
+    if (!window.matchMedia('(max-width: 880px)').matches) return;
+    const top = $('#stage').getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight * 0.3) $('#stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function photosForFilter() {
