@@ -424,6 +424,9 @@ kbd {
   z-index: 10;
 }
 .toast[data-kind="error"] { background: var(--red); }
+.toast { pointer-events: none; }
+/* leaving the booth mid-countdown would blank the photos */
+.is-shooting .topbar .link { pointer-events: none; opacity: .5; }
 
 button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
@@ -714,6 +717,37 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .is-shooting .actions { opacity: 1; }
   .is-shooting #shootBtn { opacity: .55; }
 
+  /* notifications sit at the top so they never cover the main buttons */
+  .toast {
+    top: calc(10px + env(safe-area-inset-top));
+    bottom: auto;
+    width: max-content;
+    font-size: 14px;
+    padding: 12px 18px;
+  }
+
+  /* bigger tap targets */
+  .topbar .link { padding: 10px 2px; }
+  .tab { padding: 14px 4px 11px; }
+
+  /* result: one compact button row so the photo gets the space */
+  .has-result .actions {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 8px;
+  }
+  .has-result .actions > * { width: auto; max-width: none; margin: 0; }
+  .has-result .actions .row.when-result { display: contents !important; }
+  .has-result .actions .btn {
+    padding: 13px 6px;
+    font-size: 11px;
+    letter-spacing: .08em;
+    line-height: 1.25;
+  }
+  .has-result .thumb canvas { height: 64px; }
+  .has-result .thumb { width: 72px; }
+  .thumb span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
   /* swipeable option rows */
   .chips, .thumbs {
     flex-wrap: nowrap;
@@ -740,6 +774,13 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .topbar { border-radius: 22px; }
   .who .eyebrow { display: none; }
   .countdown { text-shadow: 4px 4px 0 var(--pink); }
+}
+
+@media (max-height: 820px) and (min-width: 881px) {
+  .welcome { padding-top: 20px; padding-bottom: 16px; }
+  .arch-inner { padding-top: 40px; padding-bottom: 26px; }
+  .title { font-size: 76px; }
+  .tagline { margin-bottom: 20px; }
 }
 
 @media (max-height: 640px) and (max-width: 880px) {

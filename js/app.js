@@ -1,6 +1,7 @@
 (() => {
   const EXPORT_SCALE = 2;
   const PREVIEW_W = 640;
+  const PREVIEW_W_FILTERED = 480; // per-pixel filters are the costliest part of the live preview
   const COUNTDOWN = 3;
 
   const $ = (s) => document.querySelector(s);
@@ -12,7 +13,7 @@
     frame: FRAMES[0].id,
     filter: 'original',
     shots: [],
-    filtered: new Map(),
+    filtered: null,   // { filter, photos } for the current filter only — full-size canvases are heavy on iOS
     shooting: false,
     showingResult: false,
     facing: 'user',
@@ -77,14 +78,11 @@
 
   /* ---------- screens ---------- */
 
-  try { $('#nameInput').value = localStorage.getItem('pb-name') || ''; } catch {}
-
   $('#nameForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const n = $('#nameInput').value.trim().slice(0, 30);
     if (!n) { $('#nameInput').focus(); return; }
     state.name = n;
-    try { localStorage.setItem('pb-name', n); } catch {}
     enterBooth();
   });
 
@@ -103,7 +101,7 @@
     resetShots();
     state.name = '';
     $('#nameInput').value = '';
-    try { localStorage.removeItem('pb-name'); } catch {}
+    stopCamera();
     $('#booth').hidden = true;
     $('#welcome').hidden = false;
     $('#nameInput').focus();
@@ -157,6 +155,23 @@
     btn.disabled = false;
   }
 
+  // Turns the camera light off between guests and while the binder is open.
+  function stopCamera() {
+    if (stream) stream.getTracks().forEach((t) => t.stop());
+    stream = null;
+    video.srcObject = null;
+  }
+
+  window.addEventListener('binder:open', stopCamera);
+  window.addEventListener('binder:close', () => { if (!$('#booth').hidden && !stream) startCamera(); });
+
+  // iOS can end the camera while the guest is in another app; restart it on return.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || $('#booth').hidden || state.shooting) return;
+    const track = stream && stream.getVideoTracks()[0];
+    if (!track || track.readyState === 'ended' || video.paused) startCamera();
+  });
+
   function showCamError(msg) {
     $('#camErrorMsg').textContent = msg;
     $('#camError').hidden = false;
@@ -166,13 +181,15 @@
   $('#switchCam').addEventListener('click', switchCamera);
 
   function loop() {
+    if (!stream) { looping = false; return; } // startCamera() restarts it
     requestAnimationFrame(loop);
     if (state.showingResult || !video.videoWidth) return;
-    const w = PREVIEW_W, h = Math.round(PREVIEW_W / slotAspect());
+    const p = getFilter(state.filter).p;
+    const filtered = Object.keys(p).length > 0;
+    const w = filtered ? PREVIEW_W_FILTERED : PREVIEW_W, h = Math.round(w / slotAspect());
     if (preview.width !== w || preview.height !== h) { preview.width = w; preview.height = h; }
     drawCover(pctx, video, video.videoWidth, video.videoHeight, w, h);
-    const p = getFilter(state.filter).p;
-    if (Object.keys(p).length) pctx.putImageData(applyFilter(pctx.getImageData(0, 0, w, h), p), 0, 0);
+    if (filtered) pctx.putImageData(applyFilter(pctx.getImageData(0, 0, w, h), p), 0, 0);
   }
 
   /* ---------- controls ---------- */
@@ -249,7 +266,7 @@
 
   function resetShots() {
     state.shots = [];
-    state.filtered.clear();
+    state.filtered = null;
     state.version++;
     showResult(false);
     renderFilm();
@@ -264,8 +281,12 @@
       cell.className = 'film-cell';
       cell.style.aspectRatio = String(slotAspect());
       if (state.shots[i]) {
-        const c = filteredCopy(state.shots[i], state.filter);
-        cell.append(c);
+        const src = state.shots[i];
+        const small = document.createElement('canvas');
+        small.width = 160;
+        small.height = Math.round(160 * src.height / src.width);
+        small.getContext('2d').drawImage(src, 0, 0, small.width, small.height);
+        cell.append(filteredCopy(small, state.filter));
       } else {
         cell.textContent = i + 1;
       }
@@ -339,10 +360,11 @@
   }
 
   function photosForFilter() {
-    if (!state.filtered.has(state.filter)) {
-      state.filtered.set(state.filter, state.shots.map((s) => filteredCopy(s, state.filter)));
+    if (!state.filtered || state.filtered.filter !== state.filter) {
+      state.filtered = null; // release the previous set before allocating the next
+      state.filtered = { filter: state.filter, photos: state.shots.map((s) => filteredCopy(s, state.filter)) };
     }
-    return state.filtered.get(state.filter);
+    return state.filtered.photos;
   }
 
   function renderResult() {
@@ -388,17 +410,18 @@
     if (!blob) return;
     const file = new File([blob], fileName(), { type: 'image/jpeg' });
 
-    // Phones: the share sheet has "Save Image", which goes straight to the gallery.
-    if (IS_TOUCH && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        return;
-      } catch (err) {
-        if (err.name === 'AbortError') return;
+    if (IS_TOUCH) {
+      // The share sheet has "Save Image", which goes straight to the gallery.
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
       }
-    }
-    // In-app browsers (Instagram, WhatsApp, …) ignore downloads; long-press still works.
-    if (IS_TOUCH && (IN_APP || navigator.canShare)) {
+      // Phone browsers without sharing (in-app webviews) often ignore downloads,
+      // and the result is a canvas, which can't be long-pressed — show a real image.
       showSaveSheet(blob);
       return;
     }
@@ -409,7 +432,6 @@
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 60000);
-    if (IS_TOUCH) toast('Kalau foto tidak tersimpan, tekan lama foto di layar lalu pilih Simpan.');
   }
 
   function showSaveSheet(blob) {
@@ -446,7 +468,10 @@
       state.sentVersion = version;
       toast(`Yay! Foto ${name} sudah tersimpan di Drive 💛`);
     } catch (err) {
-      toast(`Gagal simpan ke Drive: ${err.message}. Coba tekan "Simpan ke Drive" lagi.`, 'error');
+      const reason = err instanceof SyntaxError ? 'Google Drive tidak merespons dengan benar'
+        : err instanceof TypeError ? 'koneksi internet terputus'
+        : err.message;
+      toast(`Gagal simpan ke Drive (${reason}). Coba tekan "Simpan ke Drive" lagi.`, 'error');
     } finally {
       state.uploading = false;
       updateDriveBtn();

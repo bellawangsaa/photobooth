@@ -29,6 +29,7 @@
     screens.forEach((id) => { $(`#${id}`).hidden = true; });
     $('#binder').hidden = false;
     window.scrollTo(0, 0);
+    window.dispatchEvent(new Event('binder:open'));
     if (!state.loaded) load();
   }
 
@@ -36,6 +37,7 @@
     if ($('#viewer').open) $('#viewer').close();
     $('#binder').hidden = true;
     $(`#${state.returnTo}`).hidden = false;
+    window.dispatchEvent(new Event('binder:close'));
   }
 
   function route() {
