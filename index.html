@@ -72,7 +72,13 @@
         <video id="video" playsinline muted autoplay></video>
       </section>
 
-      <aside class="panel">
+      <aside class="panel" data-tab="filter">
+        <div class="tabs" role="tablist" aria-label="Pilihan">
+          <button type="button" class="tab" role="tab" data-tab="layout" aria-selected="false">Layout</button>
+          <button type="button" class="tab" role="tab" data-tab="filter" aria-selected="true">Filter</button>
+          <button type="button" class="tab" role="tab" data-tab="frame" aria-selected="false">Frame</button>
+        </div>
+
         <div id="film" class="film" aria-label="Foto yang sudah diambil"></div>
 
         <div class="actions">
@@ -85,17 +91,17 @@
           </div>
         </div>
 
-        <fieldset class="group when-live">
+        <fieldset class="group when-live" data-group="layout">
           <legend class="eyebrow">Layout</legend>
           <div id="layoutChips" class="chips"></div>
         </fieldset>
 
-        <fieldset class="group">
+        <fieldset class="group" data-group="filter">
           <legend class="eyebrow">Filter</legend>
           <div id="filterChips" class="chips"></div>
         </fieldset>
 
-        <fieldset class="group">
+        <fieldset class="group" data-group="frame">
           <legend class="eyebrow">Frame</legend>
           <div id="frameThumbs" class="thumbs"></div>
         </fieldset>

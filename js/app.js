@@ -321,7 +321,15 @@
     updateDriveBtn();
   }
 
+  // Phone-only tabs in the bottom sheet (on desktop every group is visible).
+  function setTab(tab) {
+    $('.panel').dataset.tab = tab;
+    for (const t of document.querySelectorAll('.tab')) t.setAttribute('aria-selected', String(t.dataset.tab === tab));
+  }
+  for (const t of document.querySelectorAll('.tab')) t.addEventListener('click', () => setTab(t.dataset.tab));
+
   function showResult(on) {
+    if (on && $('.panel').dataset.tab === 'layout') setTab('frame');
     state.showingResult = on;
     document.body.classList.toggle('has-result', on);
     $('#stage').dataset.layout = state.layout;

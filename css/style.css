@@ -407,51 +407,104 @@ kbd {
 
 button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
-/* ---------- phone / tablet ---------- */
+/* ---------- phone / tablet: full-screen camera app ---------- */
+
+.tabs { display: none; }
 
 @media (max-width: 880px) {
   .booth {
-    padding: 10px 12px calc(150px + env(safe-area-inset-bottom));
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: calc(8px + env(safe-area-inset-top)) 10px 0;
+    overflow: hidden;
   }
-  .has-result .booth { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
-
   .topbar {
-    padding: 8px 14px;
-    margin-bottom: 12px;
+    flex: none;
+    padding: 6px 14px;
+    margin-bottom: 8px;
     gap: 4px 12px;
   }
-  .brand .script { font-size: 22px; }
-  .who strong { font-size: 22px; }
+  .brand .script { font-size: 21px; }
+  .who strong { font-size: 21px; }
 
-  .booth-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  .panel, .stage { min-width: 0; }
-
-  .stage { padding: 10px; border-radius: 22px; scroll-margin-top: 10px; }
-  .stage::before { inset: 5px; border-radius: 18px; }
-  .stage-live, .stage-result { min-height: 200px; }
-  #preview { max-height: 50dvh; border-width: 5px; border-radius: 12px; }
-  #result, .stage[data-layout="strip"] #result { max-height: 62dvh; }
-
-  .panel { padding: 16px 14px; gap: 16px; border-radius: 20px; overflow: hidden; }
-  .film { max-width: 360px; width: 100%; margin: 0 auto; }
-
-  /* main buttons stay within thumb reach */
-  .actions {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 5;
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    background: rgba(253, 248, 236, .94);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-top: 2px solid var(--pink-soft);
-    box-shadow: 0 -10px 24px -16px rgba(110, 50, 40, .35);
+  .booth-grid {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
   }
-  .actions > * { width: 100%; max-width: 520px; margin-inline: auto; }
+
+  /* the photo gets every pixel the controls don't need */
+  .stage {
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    border-radius: 22px;
+  }
+  .stage::before { inset: 5px; border-radius: 18px; }
+  .stage-live, .stage-result {
+    position: absolute;
+    inset: 12px;
+    min-height: 0;
+  }
+  #preview, #result,
+  .stage[data-layout="strip"] #result {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  #preview { border-width: 5px; border-radius: 12px; }
+  #result { border-radius: 8px; }
+  .cam-error, .flash { border-radius: 12px; }
+
+  /* bottom sheet with tabs */
+  .panel {
+    flex: none;
+    margin: 8px -10px 0;
+    padding: 4px 14px calc(12px + env(safe-area-inset-bottom));
+    gap: 10px;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 24px -18px rgba(110, 50, 40, .4), inset 0 2px 0 var(--pink-soft);
+    overflow: hidden;
+  }
+  .film { display: none; }
+
+  .tabs {
+    display: flex;
+    order: 1;
+    gap: 4px;
+    border-bottom: 2px solid #F8E3E6;
+  }
+  .tab {
+    flex: 1;
+    background: none;
+    border: 0;
+    padding: 10px 4px 8px;
+    margin-bottom: -2px;
+    border-bottom: 3px solid transparent;
+    font: 700 12px var(--sans);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #B98A8D;
+    cursor: pointer;
+  }
+  .tab[aria-selected="true"] { color: var(--pink); border-bottom-color: var(--pink); }
+  .has-result .tab[data-tab="layout"] { display: none; }
+
+  .group { order: 2; }
+  .group legend { display: none; }
+  .panel:not([data-tab="layout"]) .group[data-group="layout"],
+  .panel:not([data-tab="filter"]) .group[data-group="filter"],
+  .panel:not([data-tab="frame"]) .group[data-group="frame"] { display: none; }
+
+  .actions { order: 3; }
   .actions .hint { display: none !important; }
-  .btn.big { padding: 17px 22px; }
+  .btn.big { padding: 16px 22px; }
+  .is-shooting .group, .is-shooting .tabs { opacity: .45; pointer-events: none; }
   .is-shooting .actions { opacity: 1; }
   .is-shooting #shootBtn { opacity: .55; }
 
@@ -462,16 +515,13 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     scroll-snap-type: x proximity;
     scrollbar-width: none;
     margin-inline: -14px;
-    padding: 2px 14px 4px;
+    padding: 4px 14px;
   }
   .chips::-webkit-scrollbar, .thumbs::-webkit-scrollbar { display: none; }
-  .chip { flex: none; scroll-snap-align: start; padding: 10px 16px; }
-  .thumbs {
-    display: flex;
-    gap: 10px;
-  }
-  .thumb { flex: none; width: 96px; scroll-snap-align: start; }
-  .thumb canvas { height: 104px; }
+  .chip { flex: none; scroll-snap-align: start; padding: 11px 16px; }
+  .thumbs { display: flex; gap: 8px; }
+  .thumb { flex: none; width: 82px; padding: 6px 4px; scroll-snap-align: start; font-size: 11px; }
+  .thumb canvas { height: 84px; }
 }
 
 @media (max-width: 480px) {
@@ -486,6 +536,8 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .countdown { text-shadow: 4px 4px 0 var(--pink); }
 }
 
-@media (max-height: 700px) and (max-width: 880px) {
-  #preview { max-height: 42dvh; }
+@media (max-height: 640px) and (max-width: 880px) {
+  .thumb canvas { height: 64px; }
+  .thumb { width: 68px; }
+  .btn.big { padding: 13px 20px; }
 }
