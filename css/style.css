@@ -427,6 +427,174 @@ kbd {
 
 button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
+/* ---------- photo binder ---------- */
+
+.binder-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--pink);
+  font: 700 13px var(--sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--pink);
+  text-decoration: none;
+}
+.binder-link:hover { background: #FFF1F3; }
+.binder-link + .foot { margin-top: 10px; }
+
+.binder {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+}
+.binder-head {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 18px 0 20px;
+}
+.binder-head .lotus { margin-bottom: 8px; }
+.binder-head .title { font-size: clamp(56px, 14vw, 88px); margin: 2px 0 6px; }
+.binder-chips { justify-content: center; margin-bottom: 22px; }
+.binder-chips .chip { padding: 9px 16px; }
+
+.binder-grid {
+  columns: 4 220px;
+  column-gap: 18px;
+}
+.polaroid {
+  display: block;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 10px 10px 6px;
+  border: 0;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 10px 22px -14px rgba(110, 50, 40, .55);
+  transform: rotate(var(--tilt, 0deg));
+  break-inside: avoid;
+  cursor: zoom-in;
+  position: relative;
+  transition: transform .15s ease;
+}
+.polaroid::before {
+  /* washi tape */
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 70px;
+  height: 20px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(247, 181, 196, .75);
+}
+.polaroid:nth-child(3n+2)::before { background: rgba(248, 217, 118, .8); }
+.polaroid:nth-child(3n)::before { background: rgba(205, 224, 165, .85); }
+.polaroid:hover { transform: rotate(0deg) scale(1.02); }
+.polaroid img {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  background: var(--cream);
+  border-radius: 3px;
+}
+.polaroid span {
+  display: block;
+  padding: 6px 4px 2px;
+  font-size: 22px;
+  color: var(--pink);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.binder-status {
+  text-align: center;
+  padding: 40px 16px;
+  font-weight: 600;
+  color: #A7787A;
+}
+
+.viewer {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(60, 28, 32, .94);
+  color: #fff;
+}
+.viewer[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.viewer::backdrop { background: rgba(60, 28, 32, .6); }
+.viewer img {
+  flex: 1;
+  min-height: 0;
+  max-width: calc(100% - 32px);
+  object-fit: contain;
+  margin-top: calc(56px + env(safe-area-inset-top));
+}
+.viewer-bar {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.viewer-bar strong { font-size: 30px; color: var(--yellow); margin-right: 10px; }
+.viewer-bar .eyebrow { color: var(--pink-soft); }
+.viewer-bar .row { display: flex; gap: 10px; }
+.viewer-bar .btn { text-decoration: none; padding: 12px 18px; font-size: 12px; }
+.viewer-close, .viewer-nav {
+  position: absolute;
+  border: 0;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.viewer-close {
+  top: calc(10px + env(safe-area-inset-top));
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  font-size: 30px;
+}
+.viewer-nav { top: 45%; width: 48px; height: 48px; font-size: 36px; }
+.viewer-nav.prev { left: 10px; }
+.viewer-nav.next { right: 10px; }
+.viewer-close:hover, .viewer-nav:hover { background: var(--pink); }
+
+@media (max-width: 600px) {
+  .binder { padding: 10px 12px 40px; }
+  .binder-grid { columns: 2; column-gap: 12px; }
+  .polaroid { padding: 6px 6px 4px; margin-bottom: 14px; }
+  .polaroid span { font-size: 17px; }
+  .binder-chips { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; margin-inline: -12px; padding: 4px 12px; }
+  .binder-chips .chip { flex: none; }
+  .viewer-bar { justify-content: center; text-align: center; }
+  .viewer-nav { display: none; }
+}
+
 /* ---------- phone / tablet: full-screen camera app ---------- */
 
 .tabs { display: none; }

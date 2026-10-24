@@ -9,18 +9,19 @@ const C = {
 };
 
 // Coordinates are in "design pixels"; the final export is rendered at 2x.
+// Portrait photo slots so the camera fills a phone held upright.
 const LAYOUTS = {
   strip: {
-    label: 'Strip', hint: '3 foto', w: 600, h: 1800, footerY: 1345,
-    slots: [160, 565, 970].map((y) => ({ x: 50, y, w: 500, h: 375 })),
+    label: 'Strip', hint: '3 foto', w: 600, h: 2340, footerY: 1900,
+    slots: [160, 750, 1340].map((y) => ({ x: 50, y, w: 500, h: 560 })),
   },
   grid: {
-    label: 'Grid', hint: '4 foto', w: 1200, h: 1500, footerY: 1090,
-    slots: [[90, 190], [615, 190], [90, 650], [615, 650]].map(([x, y]) => ({ x, y, w: 495, h: 440 })),
+    label: 'Grid', hint: '4 foto', w: 1200, h: 1960, footerY: 1540,
+    slots: [[90, 190], [615, 190], [90, 880], [615, 880]].map(([x, y]) => ({ x, y, w: 495, h: 660 })),
   },
   single: {
-    label: 'Single', hint: '1 foto', w: 1200, h: 1500, footerY: 1090,
-    slots: [{ x: 90, y: 190, w: 1020, h: 900 }],
+    label: 'Single', hint: '1 foto', w: 1200, h: 1900, footerY: 1465,
+    slots: [{ x: 90, y: 190, w: 1020, h: 1275 }],
   },
 };
 

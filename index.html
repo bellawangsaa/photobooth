@@ -36,6 +36,10 @@
       </div>
       <div class="tile-band" aria-hidden="true"></div>
     </section>
+    <a href="#binder" class="binder-link">
+      <svg class="lotus sm" aria-hidden="true"><use href="#lotus"/></svg>
+      Lihat Photo Binder
+    </a>
     <p class="foot script">Bella the Twenties</p>
   </main>
 
@@ -50,6 +54,7 @@
       <div class="who">
         <span class="eyebrow small">Hai,</span>
         <strong id="hello" class="script"></strong>
+        <a href="#binder" class="link">Binder</a>
         <button id="nextGuest" type="button" class="link">Tamu berikutnya</button>
       </div>
     </header>
@@ -112,11 +117,55 @@
     </div>
   </main>
 
+  <!-- Photo Binder (gallery of everything saved to Drive) -->
+  <main id="binder" class="binder" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="lotus sm" aria-hidden="true"><use href="#lotus"/></svg>
+        <span class="script">Belly's Bar</span>
+        <span class="eyebrow">Photo Binder</span>
+      </div>
+      <div class="who">
+        <button id="binderRefresh" type="button" class="link">Muat ulang</button>
+        <button id="binderBack" type="button" class="link">&larr; Kembali</button>
+      </div>
+    </header>
+
+    <div class="binder-head">
+      <svg class="lotus" aria-hidden="true"><use href="#lotus"/></svg>
+      <p class="eyebrow">Bella the Twenties</p>
+      <h1 class="script title">Photo Binder</h1>
+      <p id="binderCount" class="eyebrow small"></p>
+    </div>
+
+    <div id="guestChips" class="chips binder-chips" aria-label="Filter per tamu"></div>
+    <div id="binderGrid" class="binder-grid"></div>
+    <div id="binderStatus" class="binder-status" hidden></div>
+  </main>
+
+  <dialog id="viewer" class="viewer" aria-label="Lihat foto">
+    <button id="viewerClose" type="button" class="viewer-close" aria-label="Tutup">&times;</button>
+    <button id="viewerPrev" type="button" class="viewer-nav prev" aria-label="Foto sebelumnya">&lsaquo;</button>
+    <img id="viewerImg" alt="">
+    <button id="viewerNext" type="button" class="viewer-nav next" aria-label="Foto berikutnya">&rsaquo;</button>
+    <div class="viewer-bar">
+      <div>
+        <strong id="viewerName" class="script"></strong>
+        <span id="viewerDate" class="eyebrow small"></span>
+      </div>
+      <div class="row">
+        <a id="viewerDownload" class="btn btn-pink" href="#" target="_blank" rel="noopener">Download</a>
+        <a id="viewerOpen" class="btn btn-ghost" href="#" target="_blank" rel="noopener">Buka di Drive</a>
+      </div>
+    </div>
+  </dialog>
+
   <div id="toast" class="toast" role="status" hidden></div>
 
   <script src="js/config.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/frames.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/binder.js"></script>
 </body>
 </html>

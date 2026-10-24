@@ -30,9 +30,48 @@ function doPost(e) {
   }
 }
 
-// Lets you open the /exec URL in a browser to check the deployment works.
-function doGet() {
+// ?action=list → every photo for the Photo Binder page.
+// Without it, opening the /exec URL just confirms the deployment works.
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'list') {
+    try {
+      return json_({ ok: true, photos: listPhotos_() });
+    } catch (err) {
+      return json_({ ok: false, error: String(err.message || err) });
+    }
+  }
   return json_({ ok: true, message: "Belly's Bar photobooth is ready" });
+}
+
+function listPhotos_() {
+  const root = DriveApp.getFolderById(FOLDER_ID);
+  // The binder loads images straight from Drive, so the folder must be viewable by link.
+  if (root.getSharingAccess() !== DriveApp.Access.ANYONE_WITH_LINK) {
+    root.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  }
+  const photos = [];
+  collect_(root, '', photos);
+  photos.sort(function (a, b) { return b.time - a.time; });
+  return photos;
+}
+
+function collect_(folder, guest, out) {
+  const files = folder.getFiles();
+  while (files.hasNext()) {
+    const f = files.next();
+    if (f.getMimeType().indexOf('image/') !== 0) continue;
+    out.push({
+      id: f.getId(),
+      name: f.getName(),
+      guest: guest || f.getName().split(' - ')[0],
+      time: f.getDateCreated().getTime(),
+    });
+  }
+  const subs = folder.getFolders();
+  while (subs.hasNext()) {
+    const sub = subs.next();
+    collect_(sub, sub.getName(), out);
+  }
 }
 
 function clean_(s) {

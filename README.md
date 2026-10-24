@@ -9,8 +9,10 @@ Alurnya: tamu isi nama → pilih layout, filter, dan frame → foto dengan hitun
 - **3 layout:** Strip (3 foto), Grid (4 foto), dan Single (1 foto)
 - **9 filter:** Original, Butter, Rosé, Mono, Vintage, Sky, Garden, Pop, dan Film B&W. Preview kamera langsung pakai filter, dan filter + frame masih bisa diganti setelah foto diambil.
 - **6 frame brand:** Belly's Bar, Bella's 21st, You've Made It, BW Monogram, Cheers!, dan Garden Party. Nama tamu dan tanggal otomatis tercetak di frame.
-- Hasil foto resolusi tinggi (strip 1200×3600, grid/single 2400×3000)
+- Hasil foto resolusi tinggi (strip 1200×4680, grid 2400×3920, single 2400×3800), dengan kotak foto potret supaya kamera besar di HP
+- **Photo Binder** (`/#binder`): galeri semua foto dari folder Drive, bisa difilter per tamu, dibuka besar, dan di-download. Folder Drive otomatis dibuat bisa dilihat lewat link supaya fotonya bisa tampil.
 - Tombol **Tamu berikutnya** untuk mode kiosk di acara
+- Tombol **ganti kamera** depan/belakang
 - Tekan `Spasi` untuk mulai foto
 
 Tanpa build step dan tanpa dependency, cukup HTML, CSS, dan JS biasa.
@@ -22,6 +24,7 @@ js/config.js       ← isi URL Apps Script di sini
 js/filters.js      ← definisi filter
 js/frames.js       ← layout + desain frame (digambar di canvas)
 js/app.js          ← kamera, countdown, upload
+js/binder.js       ← halaman Photo Binder (galeri)
 apps-script/Code.gs ← backend Google Drive
 ```
 
