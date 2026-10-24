@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Belly's Bar Photobooth</title>
+  <meta name="description" content="Photobooth online untuk Bella's 21st Birthday.">
+  <meta name="theme-color" content="#F8D976">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 28'%3E%3Cpath fill='%23F2717E' d='M20 1C26.5 9 26.5 19 20 27C13.5 19 13.5 9 20 1ZM19 27C11 25.5 3.5 19 1.5 10C9.5 10.5 16 17 19 27ZM21 27C29 25.5 36.5 19 38.5 10C30.5 10.5 24 17 21 27Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Yellowtail&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="lotus" viewBox="0 0 40 28">
+      <path d="M20 1C26.5 9 26.5 19 20 27C13.5 19 13.5 9 20 1ZM19 27C11 25.5 3.5 19 1.5 10C9.5 10.5 16 17 19 27ZM21 27C29 25.5 36.5 19 38.5 10C30.5 10.5 24 17 21 27Z"/>
+    </symbol>
+  </svg>
+
+  <!-- Welcome -->
+  <main id="welcome" class="welcome">
+    <section class="arch">
+      <div class="arch-inner">
+        <svg class="lotus" aria-hidden="true"><use href="#lotus"/></svg>
+        <p class="eyebrow">Welcome to,</p>
+        <h1 class="script title">Belly's Bar!</h1>
+        <p class="script tagline">A little celebration, a few good drinks,<br>and another year around the sun.</p>
+
+        <form id="nameForm" class="name-form" autocomplete="off">
+          <label for="nameInput" class="eyebrow small">Siapa namamu?</label>
+          <input id="nameInput" name="name" type="text" maxlength="30" placeholder="Tulis namamu di sini" required>
+          <button type="submit" class="btn btn-pink">Masuk Photobooth</button>
+        </form>
+      </div>
+      <div class="tile-band" aria-hidden="true"></div>
+    </section>
+    <p class="foot script">Bella the Twenties</p>
+  </main>
+
+  <!-- Booth -->
+  <main id="booth" class="booth" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="lotus sm" aria-hidden="true"><use href="#lotus"/></svg>
+        <span class="script">Belly's Bar</span>
+        <span class="eyebrow">Photobooth</span>
+      </div>
+      <div class="who">
+        <span class="eyebrow small">Hai,</span>
+        <strong id="hello" class="script"></strong>
+        <button id="nextGuest" type="button" class="link">Tamu berikutnya</button>
+      </div>
+    </header>
+
+    <div class="booth-grid">
+      <section id="stage" class="stage" data-layout="strip">
+        <div class="stage-live">
+          <canvas id="preview" aria-label="Preview kamera"></canvas>
+          <div id="countdown" class="countdown script" hidden></div>
+          <div id="shotCounter" class="shot-counter eyebrow" hidden></div>
+          <div id="flash" class="flash"></div>
+          <div id="camError" class="cam-error" hidden>
+            <p id="camErrorMsg"></p>
+            <button id="camRetry" type="button" class="btn btn-pink">Coba lagi</button>
+          </div>
+        </div>
+        <div class="stage-result">
+          <canvas id="result" aria-label="Hasil foto"></canvas>
+        </div>
+        <video id="video" playsinline muted autoplay></video>
+      </section>
+
+      <aside class="panel">
+        <div id="film" class="film" aria-label="Foto yang sudah diambil"></div>
+
+        <div class="actions">
+          <button id="shootBtn" type="button" class="btn btn-pink big when-live">Mulai Foto</button>
+          <p class="hint when-live">atau tekan <kbd>Spasi</kbd> · hitung mundur 3 detik tiap foto</p>
+          <button id="driveBtn" type="button" class="btn btn-pink big when-result"><span>Simpan ke Drive</span></button>
+          <div class="row when-result">
+            <button id="downloadBtn" type="button" class="btn btn-ghost">Download</button>
+            <button id="retakeBtn" type="button" class="btn btn-ghost">Foto ulang</button>
+          </div>
+        </div>
+
+        <fieldset class="group when-live">
+          <legend class="eyebrow">Layout</legend>
+          <div id="layoutChips" class="chips"></div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend class="eyebrow">Filter</legend>
+          <div id="filterChips" class="chips"></div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend class="eyebrow">Frame</legend>
+          <div id="frameThumbs" class="thumbs"></div>
+        </fieldset>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/frames.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
